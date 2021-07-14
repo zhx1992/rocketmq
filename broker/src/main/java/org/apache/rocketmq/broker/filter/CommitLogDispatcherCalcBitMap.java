@@ -30,7 +30,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- * Calculate bit map of filter.
+ * Calculate bit map of filter.ddd
  */
 public class CommitLogDispatcherCalcBitMap implements CommitLogDispatcher {
 
