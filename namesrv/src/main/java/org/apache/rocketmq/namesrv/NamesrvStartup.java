@@ -54,7 +54,9 @@ public class NamesrvStartup {
     public static NamesrvController main0(String[] args) {
 
         try {
+            //步骤一
             NamesrvController controller = createNamesrvController(args);
+            //步骤二
             start(controller);
             String tip = "The Name Server boot success. serializeType=" + RemotingCommand.getSerializeTypeConfigInThisServer();
             log.info(tip);
@@ -72,22 +74,28 @@ public class NamesrvStartup {
         System.setProperty(RemotingCommand.REMOTING_VERSION_KEY, Integer.toString(MQVersion.CURRENT_VERSION));
         //PackageConflictDetect.detectFastjson();
 
+        //创建命令行参数对象，这里定义了-h,-n参数
         Options options = ServerUtil.buildCommandlineOptions(new Options());
+        //根据Options和args构建命令行对象,buildCommandlineOptions方法定义了-c,-p参数
         commandLine = ServerUtil.parseCmdLine("mqnamesrv", args, buildCommandlineOptions(options), new PosixParser());
         if (null == commandLine) {
             System.exit(-1);
             return null;
         }
-
+        //根据运行时传递的参数生成commandLine对象,解析-c(指定文件),-p(打印相关)
         final NamesrvConfig namesrvConfig = new NamesrvConfig();
         final NettyServerConfig nettyServerConfig = new NettyServerConfig();
         nettyServerConfig.setListenPort(9876);
         if (commandLine.hasOption('c')) {
+            //读取命令行-c参数指定的配置文件
             String file = commandLine.getOptionValue('c');
             if (file != null) {
+                //文件转换为输入流
                 InputStream in = new BufferedInputStream(new FileInputStream(file));
                 properties = new Properties();
+                //加载到属性对象
                 properties.load(in);
+                //装载配置
                 MixAll.properties2Object(properties, namesrvConfig);
                 MixAll.properties2Object(properties, nettyServerConfig);
 
@@ -123,9 +131,10 @@ public class NamesrvStartup {
         MixAll.printObjectProperties(log, namesrvConfig);
         MixAll.printObjectProperties(log, nettyServerConfig);
 
+        //利用namesrvConfig和nettyServerConfig创建NamesrvController对象
         final NamesrvController controller = new NamesrvController(namesrvConfig, nettyServerConfig);
 
-        // remember all configs to prevent discard
+        // remember all configs to prevent discard(防丢失)
         controller.getConfiguration().registerConfig(properties);
 
         return controller;
