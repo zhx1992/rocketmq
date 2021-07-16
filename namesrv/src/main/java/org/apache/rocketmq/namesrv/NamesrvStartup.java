@@ -152,6 +152,7 @@ public class NamesrvStartup {
             System.exit(-3);
         }
 
+        //注册钩子函数，jvm进程关闭时，优雅的释放netty服务，线程池资源等
         Runtime.getRuntime().addShutdownHook(new ShutdownHookThread(log, new Callable<Void>() {
             @Override
             public Void call() throws Exception {
@@ -160,6 +161,7 @@ public class NamesrvStartup {
             }
         }));
 
+        //核心控制器启动
         controller.start();
 
         return controller;
