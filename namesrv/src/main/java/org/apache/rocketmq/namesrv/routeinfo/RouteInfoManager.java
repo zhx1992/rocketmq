@@ -116,7 +116,7 @@ public class RouteInfoManager {
         try {
             try {
                 this.lock.writeLock().lockInterruptibly();
-
+                //获取集群下所有的broker名称，并且把当前broker加入到clusterAddrTable
                 Set<String> brokerNames = this.clusterAddrTable.get(clusterName);
                 if (null == brokerNames) {
                     brokerNames = new HashSet<String>();
@@ -126,6 +126,7 @@ public class RouteInfoManager {
 
                 boolean registerFirst = false;
 
+                //获取broker信息，如果是首次注册，那么生成一个新的BrokerData加入到brokerAddrTable中
                 BrokerData brokerData = this.brokerAddrTable.get(brokerName);
                 if (null == brokerData) {
                     registerFirst = true;
@@ -142,10 +143,11 @@ public class RouteInfoManager {
                         it.remove();
                     }
                 }
-
+                //判断broker是否已经注册过
                 String oldAddr = brokerData.getBrokerAddrs().put(brokerId, brokerAddr);
                 registerFirst = registerFirst || (null == oldAddr);
 
+                //如果broker是master节点，并且topic信息是更新或者是首次注册，那么创建更新topic队列信息
                 if (null != topicConfigWrapper
                     && MixAll.MASTER_ID == brokerId) {
                     if (this.isBrokerTopicConfigChanged(brokerAddr, topicConfigWrapper.getDataVersion())
@@ -159,7 +161,7 @@ public class RouteInfoManager {
                         }
                     }
                 }
-
+                //更新brokerLiveTable状态信息
                 BrokerLiveInfo prevBrokerLiveInfo = this.brokerLiveTable.put(brokerAddr,
                     new BrokerLiveInfo(
                         System.currentTimeMillis(),
