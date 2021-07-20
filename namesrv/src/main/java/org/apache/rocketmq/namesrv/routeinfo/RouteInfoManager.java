@@ -200,6 +200,7 @@ public class RouteInfoManager {
 
     public boolean isBrokerTopicConfigChanged(final String brokerAddr, final DataVersion dataVersion) {
         DataVersion prev = queryBrokerTopicConfig(brokerAddr);
+        //如果dataVersion为空，或者当前dataVersion不等于brokerLiveTable中的dataVersion，那么就需要发送心跳包
         return null == prev || !prev.equals(dataVersion);
     }
 
