@@ -66,6 +66,7 @@ public class TopicConfigManager extends ConfigManager {
             this.topicConfigTable.put(topicConfig.getTopicName(), topicConfig);
         }
         {
+            //autoCreateTopicEnable打开后，会将TBW102存入topicConfigTable中
             if (this.brokerController.getBrokerConfig().isAutoCreateTopicEnable()) {
                 String topic = TopicValidator.AUTO_CREATE_TOPIC_KEY_TOPIC;
                 TopicConfig topicConfig = new TopicConfig(topic);
