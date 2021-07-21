@@ -131,7 +131,7 @@ public class UpdateTopicSubCommand implements SubCommand {
                 isOrder = Boolean.parseBoolean(commandLine.getOptionValue('o').trim());
             }
             topicConfig.setOrder(isOrder);
-
+            //单机模式创建
             if (commandLine.hasOption('b')) {
                 String addr = commandLine.getOptionValue('b').trim();
 
@@ -149,11 +149,13 @@ public class UpdateTopicSubCommand implements SubCommand {
                 System.out.printf("%s", topicConfig);
                 return;
 
-            } else if (commandLine.hasOption('c')) {
+            }
+            //集群模式创建
+            else if (commandLine.hasOption('c')) {
                 String clusterName = commandLine.getOptionValue('c').trim();
 
                 defaultMQAdminExt.start();
-
+                //与单机模式的不同点在于：需要获取该集群下所有的broker地址
                 Set<String> masterSet =
                     CommandUtil.fetchMasterAddrByClusterName(defaultMQAdminExt, clusterName);
                 for (String addr : masterSet) {
