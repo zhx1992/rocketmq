@@ -116,7 +116,7 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
         });
         //判断是否使用epoll
         if (useEpoll()) {
-            //boss
+            //boss 处理连接事件
             this.eventLoopGroupBoss = new EpollEventLoopGroup(1, new ThreadFactory() {
                 private AtomicInteger threadIndex = new AtomicInteger(0);
 
@@ -125,7 +125,7 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
                     return new Thread(r, String.format("NettyEPOLLBoss_%d", this.threadIndex.incrementAndGet()));
                 }
             });
-            //worker
+            //worker 处理读写事件
             this.eventLoopGroupSelector = new EpollEventLoopGroup(nettyServerConfig.getServerSelectorThreads(), new ThreadFactory() {
                 private AtomicInteger threadIndex = new AtomicInteger(0);
                 private int threadTotal = nettyServerConfig.getServerSelectorThreads();
