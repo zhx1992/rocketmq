@@ -77,7 +77,7 @@ public class NamesrvController {
 
         //加载kv配置:解析nameServer已经加载的kv配置路径，置于configTable中
         this.kvConfigManager.load();
-        //创建Netty网络服务对象
+        //创建Netty网络服务对象,对外开放的入口，主要用来接收broker的注册消息，还会处理一些其他的消息
         this.remotingServer = new NettyRemotingServer(this.nettyServerConfig, this.brokerHousekeepingService);
         //创建大小为8的线程池
         this.remotingExecutor =

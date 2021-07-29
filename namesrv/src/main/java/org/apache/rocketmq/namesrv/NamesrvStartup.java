@@ -146,13 +146,14 @@ public class NamesrvStartup {
             throw new IllegalArgumentException("NamesrvController is null");
         }
 
+        //初始化
         boolean initResult = controller.initialize();
         if (!initResult) {
             controller.shutdown();
             System.exit(-3);
         }
 
-        //注册钩子函数，jvm进程关闭时，优雅的释放netty服务，线程池资源等
+        //注册钩子函数---关闭钩子，用于监听jvm关闭事件，jvm进程关闭时，优雅的释放netty服务，线程池资源等
         Runtime.getRuntime().addShutdownHook(new ShutdownHookThread(log, new Callable<Void>() {
             @Override
             public Void call() throws Exception {
