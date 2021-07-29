@@ -79,7 +79,7 @@ public class NamesrvController {
         this.kvConfigManager.load();
         //创建Netty网络服务对象,对外开放的入口，主要用来接收broker的注册消息，还会处理一些其他的消息
         this.remotingServer = new NettyRemotingServer(this.nettyServerConfig, this.brokerHousekeepingService);
-        //创建大小为8的线程池
+        //创建远程服务线程池，线程池大小为8
         this.remotingExecutor =
             Executors.newFixedThreadPool(nettyServerConfig.getServerWorkerThreads(), new ThreadFactoryImpl("RemotingExecutorThread_"));
         //Netty注册
@@ -146,6 +146,7 @@ public class NamesrvController {
     }
 
     private void registerProcessor() {
+        //把当前namesrvController注册到remotingServer中，最终注册到为NettyRemotingServer的defaultRequestProcessor属性中
         if (namesrvConfig.isClusterTest()) {
 
             this.remotingServer.registerDefaultProcessor(new ClusterTestRequestProcessor(this, namesrvConfig.getProductEnvName()),
@@ -157,8 +158,9 @@ public class NamesrvController {
     }
 
     public void start() throws Exception {
+        //启动nettyServer
         this.remotingServer.start();
-
+        //监听tls配置变化
         if (this.fileWatchService != null) {
             this.fileWatchService.start();
         }
