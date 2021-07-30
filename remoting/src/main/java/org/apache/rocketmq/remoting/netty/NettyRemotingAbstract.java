@@ -220,10 +220,13 @@ public abstract class NettyRemotingAbstract {
                                 }
                             }
                         };
+                        //异步处理请求
                         if (pair.getObject1() instanceof AsyncNettyRequestProcessor) {
                             AsyncNettyRequestProcessor processor = (AsyncNettyRequestProcessor)pair.getObject1();
                             processor.asyncProcessRequest(ctx, cmd, callback);
-                        } else {
+                        }
+                        //同步处理
+                        else {
                             NettyRequestProcessor processor = pair.getObject1();
                             RemotingCommand response = processor.processRequest(ctx, cmd);
                             callback.callback(response);
