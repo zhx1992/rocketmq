@@ -420,6 +420,7 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
 
         @Override
         protected void channelRead0(ChannelHandlerContext ctx, RemotingCommand msg) throws Exception {
+            //nameserver处理producer,broker,consumer请求的消息
             processMessageReceived(ctx, msg);
         }
     }
