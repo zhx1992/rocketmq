@@ -786,7 +786,7 @@ public class BrokerController {
             this.scheduledExecutorService.awaitTermination(5000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
         }
-
+        //发送注销消息到nameServer
         this.unregisterBrokerAll();
 
         if (this.sendMessageExecutor != null) {
@@ -808,7 +808,7 @@ public class BrokerController {
         if (this.brokerOuterAPI != null) {
             this.brokerOuterAPI.shutdown();
         }
-
+        //消费位点持久化
         this.consumerOffsetManager.persist();
 
         if (this.filterServerManager != null) {
@@ -860,10 +860,12 @@ public class BrokerController {
     }
 
     public void start() throws Exception {
+        //启动各种组件
         if (this.messageStore != null) {
             this.messageStore.start();
         }
 
+        //启动 remotingServer，其实就是启动一个netty服务，用来接收producer传来的消息
         if (this.remotingServer != null) {
             this.remotingServer.start();
         }
@@ -875,7 +877,7 @@ public class BrokerController {
         if (this.fileWatchService != null) {
             this.fileWatchService.start();
         }
-
+        //broker对外发放消息的组件，向nameServer上报存活消息时使用了它，也是一个netty服务
         if (this.brokerOuterAPI != null) {
             this.brokerOuterAPI.start();
         }
@@ -891,7 +893,7 @@ public class BrokerController {
         if (this.filterServerManager != null) {
             this.filterServerManager.start();
         }
-
+        //启动消息存储相关组件
         if (!messageStoreConfig.isEnableDLegerCommitLog()) {
             startProcessorByHa(messageStoreConfig.getBrokerRole());
             handleSlaveSynchronize(messageStoreConfig.getBrokerRole());
@@ -899,7 +901,7 @@ public class BrokerController {
             this.registerBrokerAll(true, false, true);
         }
 
-        //开启定时任务：定时向nameServer发送心跳包
+        //开启定时心跳注册任务：定时向nameServer发送心跳包,发送心跳的时间间隔：最短10s,最长60s
         this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
             @Override
@@ -1005,8 +1007,10 @@ public class BrokerController {
         final int timeoutMills) {
 
         TopicConfigSerializeWrapper topicConfigWrapper = this.getTopicConfigManager().buildTopicConfigSerializeWrapper();
+        //判断是否需要进行注册
         List<Boolean> changeList = brokerOuterAPI.needRegister(clusterName, brokerAddr, brokerName, brokerId, topicConfigWrapper, timeoutMills);
         boolean needRegister = false;
+
         for (Boolean changed : changeList) {
             if (changed) {
                 needRegister = true;
